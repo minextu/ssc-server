@@ -129,6 +129,14 @@ export function handleGameState(requestId: number, player: Player, message: stri
       )
       break
     }
+    case GAME_STATE_TYPE.CHAT: {
+      const _team = strToInt(messageData, 1)
+      const text = messageData.slice(1, -1)
+      const _netId = strToInt(messageData.slice(-1), 1)
+
+      sendGameStateToAll(GAME_STATE_TYPE.CHAT, text + intToStr(player.netId, 1), undefined, requestId)
+      break
+    }
     default:
       return log(`Invalid game state type ${gameStateType}`, 'error', requestId)
   }
