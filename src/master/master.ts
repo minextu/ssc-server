@@ -11,15 +11,15 @@ const servers = [
 ]
 
 function generateServerListResponse() {
-  const response
-        = intToStr(servers.length)
-        + servers.map(server => intToStr(convertIp(server.ip))
-          + intToStr(server.port)
-          + intToStr(server.maxPlayers, 2)
-          + intToStr(server.players, 2)
-          + intToStr(server.level, 2)
-          + intToStr(server.type, 2),
-        ).join('')
+  const response = intToStr(servers.length, 4)
+    + servers.map(server =>
+      intToStr(convertIp(server.ip), 4)
+      + intToStr(server.port, 4)
+      + intToStr(server.maxPlayers, 2)
+      + intToStr(server.players, 2)
+      + intToStr(server.level, 2)
+      + intToStr(server.type, 2),
+    ).join('')
   return response
 }
 
@@ -30,23 +30,21 @@ export const masterServer = net.createServer((socket) => {
       return
     }
 
-    console.log(chalk.gray(`MASTER IN: ${JSON.stringify(str)}`))
     const message = masterDecryptString(str)
-    console.log(chalk.blueBright('MASTER REPLY: ', JSON.stringify(message)))
+    console.log(chalk.gray(`MASTER IN: ${JSON.stringify(message)}`))
 
     const operation = strToInt(message, 1)
 
     switch (operation) {
-      case 1:
-        // TODO: implement refresh
-        console.log('refresh')
+      case 1: {
+        const serverList = generateServerListResponse()
+        const response = MASTER_RESPONSE.UPDATE + serverList
 
-        // const serverList = generateServerListResponse();
-        // const response = MASTER_RESPONSE.UPDATE + serverList;
+        console.log(chalk.blueBright('MASTER REPLY: ', JSON.stringify(response)))
 
-        // console.log({ response })
-        // socket.write(masterEncryptString(response) + "\r\n");
+        socket.write(`${masterEncryptString(response)}\r\n`)
         break
+      }
       case 80: {
         const mode = strToInt(message[1], 1)
         const name = message.slice(2)
