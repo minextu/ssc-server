@@ -19,8 +19,8 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
     
 # Run
-FROM base as runner
-ENV NODE_ENV production
+FROM base AS runner
+ENV NODE_ENV=production
 
 COPY --chown=node:node --from=build /app/dist /app/dist
 COPY --chown=node:node --from=prod-deps /app/package.json /app/package.json
