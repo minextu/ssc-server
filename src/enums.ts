@@ -66,6 +66,7 @@ export enum LEAVE_TYPE {
 export enum JOIN_FAIL_REASON {
   BANNED = 1,
   NO_ROOM = 2,
+  CANCEL = 5,
 }
 
 export const POSITION_UPDATE_TYPE = {

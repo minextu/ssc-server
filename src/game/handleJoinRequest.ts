@@ -25,9 +25,16 @@ export function handleJoinRequest(requestId: number, messageData: string, info: 
       return
     }
 
-    // TODO: implement max player limit
-
-    const player = addPlayer(name, info)
+    const player = addPlayer(name, info, requestId)
+    if (!player) {
+      sendResponse(
+        GAME_PACKET.PLAYER_JOIN_REQUEST,
+        intToStr(JOIN_TYPE.FAILURE, 1) + intToStr(JOIN_FAIL_REASON.NO_ROOM, 1),
+        info,
+        requestId,
+      )
+      return
+    }
 
     // host is the only player for now
     const numPlayers = 1

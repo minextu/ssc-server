@@ -1,4 +1,6 @@
+import { MAX_PLAYERS } from '../constants.js'
 import { FIGUR, WEAPON } from '../enums.js'
+import { log } from '../utils/logging.js'
 
 export interface Player {
   name: string
@@ -49,9 +51,15 @@ export interface Player {
 
 export const players: Player[] = []
 
-export function addPlayer(name: string, info: { address: string, port: number }) {
-  // start at 2, since host is at one
-  const netId = players.length + 2
+export function addPlayer(name: string, info: { address: string, port: number }, requestId?: number) {
+  // find next available netId. Start at 2, since host is always 1
+  const netId = Array.from({ length: MAX_PLAYERS + 2 })
+    .findIndex((_, checkNetId) => checkNetId > 1 && !players.find(player => player.netId === checkNetId))
+
+  if (netId === -1) {
+    log('Room full, no available netId', 'warning', requestId)
+    return
+  }
 
   const player: Player = {
     name,
