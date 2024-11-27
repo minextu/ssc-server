@@ -83,7 +83,7 @@ export function handleJoinRequest(requestId: number, messageData: string, info: 
     )
 
     for (const otherPlayer of players) {
-      if (otherPlayer.netId === player.netId) {
+      if (otherPlayer.netId === player.netId || otherPlayer.connecting) {
         continue
       }
 

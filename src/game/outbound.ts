@@ -28,7 +28,7 @@ export function sendToAll(messageType: GAME_PACKET, messageData: string, exceptP
   logOutbound(message, { packetType: messageType, messageData }, requestId)
 
   for (const player of players) {
-    if (player.netId === exceptPlayer?.netId) {
+    if (player.netId === exceptPlayer?.netId || player.connecting) {
       continue
     }
 
@@ -50,7 +50,7 @@ export function sendGameStateToAll(gameStateType: GAME_STATE_TYPE, messageData: 
   logOutbound(messagePre + intToStr(0, 4) + messageData, { packetType: GAME_PACKET.GAME_STATE, gameStateType, messageData }, requestId)
 
   for (const player of players) {
-    if (player.netId === exceptPlayer?.netId) {
+    if (player.netId === exceptPlayer?.netId || player.connecting) {
       continue
     }
 
