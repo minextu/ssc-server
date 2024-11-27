@@ -1,4 +1,4 @@
-import { ARMOR_DAMAGE_PERCENTAGE, modelDimensions, WEAPON1_DAMAGE, WEAPON2_DAMAGE, WEAPON3_DAMAGE, WEAPON4_DAMAGE, WEAPON5_DAMAGE, WEAPON9_DAMAGE } from '../constants.js'
+import { ARMOR_DAMAGE_PERCENTAGE, modelDimensions, shotDimensions, WEAPON1_DAMAGE, WEAPON2_DAMAGE, WEAPON3_DAMAGE, WEAPON4_DAMAGE, WEAPON5_DAMAGE, WEAPON9_DAMAGE } from '../constants.js'
 import { FIGURE_SOUND, GAME_STATE_TYPE, WEAPON } from '../enums.js'
 import { intToStr } from '../utils/convert.js'
 import { log } from '../utils/logging.js'
@@ -6,10 +6,10 @@ import { rnd, seedRnd } from '../utils/random.js'
 import { sendGameStateToAll } from './outbound.js'
 import { players } from './player.js'
 
-interface Shot {
+export interface Shot {
   netId: number
   shotId: number
-  weapon: number
+  weapon: WEAPON
   entityX: number
   entityY: number
   entityZ: number
@@ -23,11 +23,12 @@ interface Shot {
   sizeX: number
   sizeY: number
   sizeZ: number
+  scale: number
   damage: number
 }
 
 let shotId = 1
-const shots: Shot[] = []
+export const shots: Shot[] = []
 
 export function fire(requestId: number, netId: number, weapon: WEAPON | 10 | 11, entityX: number, entityY: number, entityZ: number, rposX: number, rposY: number, isRecursive = false) {
   shotId++
@@ -42,29 +43,25 @@ export function fire(requestId: number, netId: number, weapon: WEAPON | 10 | 11,
   let speedX
   let speedY
   let speedZ
-  let sizeX
-  let sizeY
-  let sizeZ
+  let dimensions
   let gravity
   let lifespan
   let damage
 
   switch (weapon) {
     // fire.bb:7
-    case WEAPON.LIQUIDATOR:
+    case WEAPON.LIQUIDATOR: {
       speedX = (1.4 * (-Math.sin(rposX * Math.PI / 180))) * Math.cos(rposY * Math.PI / 180)
       speedY = 1.4 * (-Math.sin(rposY * Math.PI / 180))
       speedZ = (1.4 * Math.cos(rposX * Math.PI / 180)) * Math.cos(rposY * Math.PI / 180)
       lifespan = 0x64
       gravity = -0.003
 
-      sizeX = 34.44 * 0.01
-      sizeY = 30.90 * 0.01
-      sizeZ = 95.51 * 0.01
+      dimensions = shotDimensions[weapon]
 
       damage = WEAPON1_DAMAGE
       break
-
+    }
     case WEAPON.WATERMINATOR:
       speedX = (1.5 * (-Math.sin(rposX * Math.PI / 180))) * Math.cos(rposY * Math.PI / 180)
       speedY = 1.5 * (-Math.sin(rposY * Math.PI / 180))
@@ -72,9 +69,7 @@ export function fire(requestId: number, netId: number, weapon: WEAPON | 10 | 11,
       lifespan = 0x5A
       gravity = -0.003
 
-      sizeX = 34.44 * 0.01
-      sizeY = 30.90 * 0.01
-      sizeZ = 95.51 * 0.01
+      dimensions = shotDimensions[weapon]
 
       damage = WEAPON2_DAMAGE
       break
@@ -86,10 +81,7 @@ export function fire(requestId: number, netId: number, weapon: WEAPON | 10 | 11,
       lifespan = Math.floor(rnd(6, 0) + 30 - 3)
       gravity = -0.008
 
-      // TODO: size seems to be wrong
-      sizeX = 0.3
-      sizeY = 0.3
-      sizeZ = 0.3
+      dimensions = shotDimensions[weapon]
 
       damage = WEAPON3_DAMAGE
 
@@ -103,9 +95,7 @@ export function fire(requestId: number, netId: number, weapon: WEAPON | 10 | 11,
       lifespan = Math.floor(rnd(6, 0) + 39 - 3)
       gravity = -0.007
 
-      sizeX = 0.6
-      sizeY = 0.6
-      sizeZ = 0.6
+      dimensions = shotDimensions[weapon]
 
       damage = WEAPON4_DAMAGE
       break
@@ -118,9 +108,7 @@ export function fire(requestId: number, netId: number, weapon: WEAPON | 10 | 11,
       lifespan = 0x82
       gravity = -0.022
 
-      sizeX = 10.34 * 0.05
-      sizeY = 9.07 * 0.05
-      sizeZ = 11.89 * 0.05
+      dimensions = shotDimensions[weapon]
 
       damage = WEAPON5_DAMAGE
       break
@@ -144,14 +132,12 @@ export function fire(requestId: number, netId: number, weapon: WEAPON | 10 | 11,
       lifespan = rnd(6, 0) + 32 - 3
       gravity = -0.038
 
-      sizeX = 0.3
-      sizeY = 0.3
-      sizeZ = 0.3
+      dimensions = shotDimensions[WEAPON.WASSERBOMBEN_EXPLOSION]
 
       damage = WEAPON9_DAMAGE
       break
 
-    case 11:
+    case 11: {
       weapon = WEAPON.WASSERBOMBEN_EXPLOSION
       speedX = rnd(0.5, 0) - 0.25
       speedY = rnd(0.5, 0) - 0.55
@@ -159,13 +145,11 @@ export function fire(requestId: number, netId: number, weapon: WEAPON | 10 | 11,
       lifespan = rnd(6, 0) + 32 - 3
       gravity = -0.038
 
-      sizeX = 0.3
-      sizeY = 0.3
-      sizeZ = 0.3
+      dimensions = shotDimensions[WEAPON.WASSERBOMBEN_EXPLOSION]
 
       damage = WEAPON9_DAMAGE
       break
-
+    }
     default:
       log('fire: Invalid weapon', 'error', requestId, { weapon })
       return
@@ -185,9 +169,10 @@ export function fire(requestId: number, netId: number, weapon: WEAPON | 10 | 11,
     speedZ,
     gravity,
     lifespan,
-    sizeX,
-    sizeY,
-    sizeZ,
+    sizeX: dimensions.x,
+    sizeY: dimensions.y,
+    sizeZ: dimensions.z,
+    scale: dimensions.scale,
     damage,
   }
 
@@ -217,11 +202,24 @@ export function trackShots() {
         throw new Error(`trackShots: Invalid model dimensions for model ${player.figur}`)
       }
 
+      const transPlayerX = player.position.xpos - (playerDimensions.x / 2) * playerDimensions.scale
+      const transPlayerY = player.position.ypos - (playerDimensions.y / 2) * playerDimensions.scale
+      const transPlayerZ = player.position.zpos - (playerDimensions.z / 2) * playerDimensions.scale
+      const transPlayerDimX = playerDimensions.x * playerDimensions.scale
+      const transPlayerDimY = playerDimensions.y * playerDimensions.scale
+      const transPlayerDimZ = playerDimensions.z * playerDimensions.scale
+      const transShotX = shot.entityX - (shot.sizeX / 2) * shot.scale
+      const transShotY = shot.entityY - (shot.sizeY / 2) * shot.scale
+      const transShotZ = shot.entityZ - (shot.sizeZ / 2) * shot.scale
+      const transShotDimX = shot.sizeX * shot.scale
+      const transShotDimY = shot.sizeY * shot.scale
+      const transShotDimZ = shot.sizeZ * shot.scale
+
       // TODO: this doesn't consider walls, but I'm not sure if the official server did either
       // TODO: rotation?
-      if (shot.entityX <= player.position.xpos + playerDimensions.x && shot.entityX + shot.sizeX >= player.position.xpos
-        && shot.entityY <= player.position.ypos + playerDimensions.y && shot.entityY + shot.sizeY >= player.position.ypos
-        && shot.entityZ <= player.position.zpos + playerDimensions.z && shot.entityZ + shot.sizeZ >= player.position.zpos
+      if (transShotX <= transPlayerX + transPlayerDimX && transShotX + transShotDimX >= transPlayerX
+        && transShotY <= transPlayerY + transPlayerDimY && shot.entityY + transShotDimY >= transPlayerY
+        && transShotZ <= transPlayerZ + transPlayerDimZ && shot.entityZ + transShotDimZ >= transPlayerZ
       ) {
         shots.splice(shots.indexOf(shot), 1)
 

@@ -1,16 +1,24 @@
 import process from 'node:process'
 import chalk from 'chalk'
-import { FIGUR } from './enums.js'
+import { FIGUR, WEAPON } from './enums.js'
 
 // latest version ever released
 export const VERSION = '1.35'
 
 // extracted these from the models (i.e. models/herr_wolf_dds.b3d), then applied the scaling of 0.013
-export const modelDimensions: Record<FIGUR, { x: number, y: number, z: number }> = {
-  [FIGUR.HERR_WOLF]: { x: 102.19 * 0.013, y: 300.50 * 0.013, z: 86.77 * 0.013 },
-  [FIGUR.GERTRUDE]: { x: 91.28 * 0.013, y: 302.08 * 0.013, z: 84.1 * 0.013 },
-  [FIGUR.LISA]: { x: 93.56 * 0.013, y: 267.17 * 0.013, z: 80.23 * 0.013 },
-  [FIGUR.CHRIS]: { x: 87.07 * 0.013, y: 288.92 * 0.013, z: 102.82 * 0.013 },
+export const modelDimensions: Record<FIGUR, { x: number, y: number, z: number, scale: number }> = {
+  [FIGUR.HERR_WOLF]: { x: 102.19, y: 300.50, z: 86.77, scale: 0.013 },
+  [FIGUR.GERTRUDE]: { x: 91.28, y: 302.08, z: 84.1, scale: 0.013 },
+  [FIGUR.LISA]: { x: 93.56, y: 267.17, z: 80.23, scale: 0.013 },
+  [FIGUR.CHRIS]: { x: 87.07, y: 288.92, z: 102.82, scale: 0.013 },
+}
+export const shotDimensions: Record<WEAPON, { x: number, y: number, z: number, scale: number }> = {
+  [WEAPON.LIQUIDATOR]: { x: 1, y: 1, z: 1, scale: 0.53 },
+  [WEAPON.WATERMINATOR]: { x: 1, y: 1, z: 1, scale: 0.01 },
+  [WEAPON.TRIPLE_SHOT]: { x: 1, y: 1, z: 1, scale: 0.3 },
+  [WEAPON.ARCTIC_SHOCK]: { x: 1, y: 1, z: 1, scale: 0.6 },
+  [WEAPON.WASSERBOMBEN_ARMBRUST]: { x: 10.34, y: 9.07, z: 11.89, scale: 0.05 },
+  [WEAPON.WASSERBOMBEN_EXPLOSION]: { x: 1, y: 1, z: 1, scale: 0.3 },
 }
 
 // get these from a hexdump from the original game file
