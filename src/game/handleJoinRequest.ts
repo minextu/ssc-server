@@ -14,11 +14,10 @@ export function handleJoinRequest(requestId: number, messageData: string, info: 
     log('player joined', 'info', requestId, { joinType, name })
 
     if (findPlayerByName(name)) {
-      // TODO: restore session
       log('duplicated name', 'warning', requestId)
       sendResponse(
         GAME_PACKET.PLAYER_JOIN_REQUEST,
-        intToStr(JOIN_TYPE.FAILURE, 1) + intToStr(JOIN_FAIL_REASON.BANNED, 1),
+        intToStr(JOIN_TYPE.FAILURE, 1) + intToStr(JOIN_FAIL_REASON.CANCEL, 1),
         info,
         requestId,
       )
@@ -82,12 +81,12 @@ export function handleJoinRequest(requestId: number, messageData: string, info: 
       requestId,
     )
 
+    // prepare other connected players
     for (const otherPlayer of players) {
       if (otherPlayer.netId === player.netId || otherPlayer.connecting) {
         continue
       }
 
-      // prepare other connected players
       sendResponse(
         GAME_PACKET.PLAYER_JOIN_SUCCESS,
         intToStr(otherPlayer.netId, 1)

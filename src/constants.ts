@@ -39,12 +39,12 @@ export const HOST_ID = 1
 export const ARMOR_DAMAGE_PERCENTAGE = 50
 
 // TODO: figure these out, maybe some are random too?
-export const WEAPON1_DAMAGE = 30
-export const WEAPON2_DAMAGE = 30
-export const WEAPON3_DAMAGE = 60
-export const WEAPON4_DAMAGE = 10
-export const WEAPON5_DAMAGE = 60
-export const WEAPON9_DAMAGE = 10
+export const WEAPON1_DAMAGE = Number(process.env.WEAPON1_DAMAGE ?? 30)
+export const WEAPON2_DAMAGE = Number(process.env.WEAPON2_DAMAGE ?? 30)
+export const WEAPON3_DAMAGE = Number(process.env.WEAPON3_DAMAGE ?? 60)
+export const WEAPON4_DAMAGE = Number(process.env.WEAPON4_DAMAGE ?? 10)
+export const WEAPON5_DAMAGE = Number(process.env.WEAPON5_DAMAGE ?? 60)
+export const WEAPON9_DAMAGE = Number(process.env.WEAPON9_DAMAGE ?? 10)
 // documentation only mentions it should reduce by a bit
 // https://www.helles-koepfchen.de/online_spiele/super_soaker_championship/index.html
-export const TOWEL_HEALTH = 70
+export const TOWEL_HEALTH = Number(process.env.TOWEL_HEALTH ?? 70)
