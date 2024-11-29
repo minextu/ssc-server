@@ -1,14 +1,10 @@
 import net from 'node:net'
 import chalk from 'chalk'
-import { MAX_PLAYERS, VERSION } from '../constants.js'
+import { VERSION } from '../constants.js'
 import { GAME_TYPE, LEVEL, MASTER_RESPONSE } from '../enums.js'
 import { convertIp, intToStr, strToInt } from '../utils/convert.js'
 import { masterDecryptString, masterEncryptString } from '../utils/encryption.js'
-
-// TODO: make this dynamic maybe
-const servers = [
-  { port: 8085, maxPlayers: MAX_PLAYERS, players: 2, level: LEVEL.DIE_INSELN, type: GAME_TYPE.NORMAL, ip: '127.0.0.1' },
-]
+import { servers } from './game-bridge.js'
 
 function generateServerListResponse() {
   const response = intToStr(servers.length, 4)
@@ -16,7 +12,7 @@ function generateServerListResponse() {
       intToStr(convertIp(server.ip), 4)
       + intToStr(server.port, 4)
       + intToStr(server.maxPlayers, 2)
-      + intToStr(server.players, 2)
+      + intToStr(server.currentPlayers, 2)
       + intToStr(server.level, 2)
       + intToStr(server.type, 2),
     ).join('')

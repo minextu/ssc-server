@@ -1,12 +1,12 @@
-import type { GAME_STATE_TYPE } from '../enums.js'
-import type { Player } from './player.js'
-import { HOST_ID } from '../constants.js'
-import { GAME_PACKET } from '../enums.js'
-import { intToStr } from '../utils/convert.js'
-import { gameEncryptString } from '../utils/encryption.js'
-import { logOutbound, logReply } from '../utils/logging.js'
-import { gameServer } from './game.js'
-import { getUdpCounterForPlayer, players } from './player.js'
+import type { GAME_STATE_TYPE } from '../../enums.js'
+import type { Player } from '../state/player.js'
+import { HOST_ID } from '../../constants.js'
+import { GAME_PACKET } from '../../enums.js'
+import { intToStr } from '../../utils/convert.js'
+import { gameEncryptString } from '../../utils/encryption.js'
+import { logOutbound, logReply } from '../../utils/logging.js'
+import { gameServer } from '../game.js'
+import { getUdpCounterForPlayer, players } from '../state/player.js'
 
 export function sendResponse(messageType: GAME_PACKET, messageData: string, player: { port: number, address: string }, requestId: number, silentLog = false) {
   const message = intToStr(messageType, 1) + intToStr(HOST_ID, 1) + messageData

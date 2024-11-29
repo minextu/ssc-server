@@ -1,11 +1,11 @@
-import type { WEAPON } from '../enums.js'
-import { GAME_PACKET, LEAVE_TYPE } from '../enums.js'
-import { intToStr, strToInt } from '../utils/convert.js'
-import { log } from '../utils/logging.js'
+import type { WEAPON } from '../../enums.js'
+import { GAME_PACKET, LEAVE_TYPE } from '../../enums.js'
+import { intToStr, strToInt } from '../../utils/convert.js'
+import { log } from '../../utils/logging.js'
+import { type Player, removePlayer } from '../state/player.js'
+import { sendResponse, sendToAll } from '../utils/outbound.js'
 import { handleGameState } from './handleGameState.js'
 import { handleJoinRequest } from './handleJoinRequest.js'
-import { sendResponse, sendToAll } from './outbound.js'
-import { type Player, removePlayer } from './player.js'
 
 export function handleMessage(
   requestId: number,

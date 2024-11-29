@@ -1,5 +1,5 @@
 import type Buffer from 'node:buffer'
-import type { Player } from '../game/player.js'
+import type { Player } from '../game/state/player.js'
 import chalk from 'chalk'
 import { GAME_PACKET, GAME_STATE_TYPE } from '../enums.js'
 

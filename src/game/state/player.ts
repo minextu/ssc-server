@@ -1,6 +1,8 @@
-import { MAX_PLAYERS } from '../constants.js'
-import { FIGUR, WEAPON } from '../enums.js'
-import { log } from '../utils/logging.js'
+import { FIGUR, GAME_PACKET, LEAVE_TYPE, WEAPON } from '../../enums.js'
+import { intToStr } from '../../utils/convert.js'
+import { log } from '../../utils/logging.js'
+import { sendToAll, sendToPlayer } from '../utils/outbound.js'
+import { gameSettings } from './settings.js'
 
 export interface Player {
   name: string
@@ -53,7 +55,7 @@ export const players: Player[] = []
 
 export function addPlayer(name: string, info: { address: string, port: number }, requestId?: number) {
   // find next available netId. Start at 2, since host is always 1
-  const netId = Array.from({ length: MAX_PLAYERS + 2 })
+  const netId = Array.from({ length: gameSettings.maxPlayers + 2 })
     .findIndex((_, checkNetId) => checkNetId > 1 && !players.find(player => player.netId === checkNetId))
 
   if (netId === -1) {
@@ -110,4 +112,29 @@ export function getUdpCounterForPlayer(player: Player) {
   }
 
   return player.udp.udpCounter
+}
+
+export function processPlayerTimeouts() {
+  players.filter(p => !p.connecting).forEach((player) => {
+    if (Date.now() - player.lastHeard >= gameSettings.timeoutPeriod) {
+      log('player timed out!', 'warning', undefined, { netId: player.netId, name: player.name })
+      sendToAll(GAME_PACKET.PLAYER_LEFT, intToStr(player.netId, 1) + intToStr(LEAVE_TYPE.LOST, 1))
+      removePlayer(player.netId)
+    }
+    else if (Date.now() - player.lastHeard >= gameSettings.timeoutPeriod / 2 && player.alive) {
+      log('player about to timeout, sending alive request', 'warning', undefined, { netId: player.netId, name: player.name })
+      player.alive = false
+      sendToPlayer(GAME_PACKET.ALIVE_REQUEST, 'hello?', player)
+    }
+  })
+
+  players.filter(p => p.connecting).forEach((player) => {
+    if (Date.now() - player.lastHeard > gameSettings.timeoutPeriod) {
+      log('connecting player timed out!', 'warning', undefined, { netId: player.netId, name: player.name })
+    }
+  })
+}
+
+export function processPlayerCooldowns() {
+  players.forEach((p) => { p.deadCooldown = Math.max(0, p.deadCooldown - 1) })
 }

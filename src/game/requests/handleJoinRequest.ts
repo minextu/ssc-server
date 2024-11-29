@@ -1,9 +1,10 @@
-import { HOST_ID, MAX_PLAYERS, TIMEOUT_PERIOD } from '../constants.js'
-import { GAME_PACKET, GAME_STATE_TYPE, JOIN_FAIL_REASON, JOIN_TYPE } from '../enums.js'
-import { intToStr, strToInt } from '../utils/convert.js'
-import { log } from '../utils/logging.js'
-import { sendGameStateResponse, sendResponse, sendToAll } from './outbound.js'
-import { addPlayer, findPlayerByAddress, findPlayerByName, players } from './player.js'
+import { HOST_ID } from '../../constants.js'
+import { GAME_PACKET, GAME_STATE_TYPE, JOIN_FAIL_REASON, JOIN_TYPE } from '../../enums.js'
+import { intToStr, strToInt } from '../../utils/convert.js'
+import { log } from '../../utils/logging.js'
+import { addPlayer, findPlayerByAddress, findPlayerByName, players } from '../state/player.js'
+import { gameSettings } from '../state/settings.js'
+import { sendGameStateResponse, sendResponse, sendToAll } from '../utils/outbound.js'
 
 export function handleJoinRequest(requestId: number, messageData: string, info: { port: number, address: string }) {
   const joinType = strToInt(messageData, 1)
@@ -45,9 +46,9 @@ export function handleJoinRequest(requestId: number, messageData: string, info: 
       + intToStr(player.netId, 1)
       + intToStr(HOST_ID, 1)
       + intToStr(numPlayers, 1)
-      + intToStr(MAX_PLAYERS, 1)
+      + intToStr(gameSettings.maxPlayers, 1)
       + intToStr(gameType, 1)
-      + intToStr(TIMEOUT_PERIOD, 1),
+      + intToStr(gameSettings.timeoutPeriod, 1),
       player,
       requestId,
     )

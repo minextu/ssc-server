@@ -10,7 +10,9 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev:master": "tsx watch src/index.ts master",
+    "dev:game": "tsx watch src/index.ts game",
+    "dev": "concurrently 'pnpm dev:master' 'pnpm dev:game 2 --debug-server'",
     "start": "node dist/src/index.js",
     "build": "tsc",
     "type-check": "tsc --noEmit",
@@ -19,6 +21,7 @@
   },
   "dependencies": {
     "chalk": "^5.3.0",
+    "commander": "^12.1.0",
     "dotenv": "^16.4.5",
     "websocket": "^1.0.35"
   },
@@ -27,6 +30,7 @@
     "@tsconfig/node22": "^22.0.0",
     "@types/node": "^22.8.6",
     "@types/websocket": "^1.0.10",
+    "concurrently": "^9.1.0",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   }

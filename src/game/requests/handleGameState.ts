@@ -1,11 +1,11 @@
-import type { FIGUR, WEAPON } from '../enums.js'
-import { TOWEL_HEALTH } from '../constants.js'
-import { FIGURE_SOUND, GAME_PACKET, GAME_STATE_TYPE, ITEM_TYPE } from '../enums.js'
-import { intToStr, strToInt } from '../utils/convert.js'
-import { extendLogContext, log } from '../utils/logging.js'
-import { sendGameStateResponse, sendGameStateToAll, sendResponse } from './outbound.js'
-import { type Player, players } from './player.js'
-import { fire } from './trackShots.js'
+import type { FIGUR, WEAPON } from '../../enums.js'
+import { TOWEL_HEALTH } from '../../constants.js'
+import { FIGURE_SOUND, GAME_PACKET, GAME_STATE_TYPE, ITEM_TYPE } from '../../enums.js'
+import { intToStr, strToInt } from '../../utils/convert.js'
+import { extendLogContext, log } from '../../utils/logging.js'
+import { type Player, players } from '../state/player.js'
+import { fire } from '../state/shot.js'
+import { sendGameStateResponse, sendGameStateToAll, sendResponse } from '../utils/outbound.js'
 
 export function handleGameState(requestId: number, player: Player, message: string) {
   const gameStateType = strToInt(message, 2)

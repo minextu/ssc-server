@@ -28,4 +28,4 @@ COPY --chown=node:node --from=prod-deps /app/node_modules /app/node_modules
 
 RUN corepack pack
 
-CMD ["pnpm", "start"]
+ENTRYPOINT ["pnpm", "start"]

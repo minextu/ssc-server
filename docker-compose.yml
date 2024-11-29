@@ -1,7 +1,37 @@
 services:
-  server:
+  master:
+    image: minextu/ssc-server
     build: .
     env_file: ".env"
+    environment:
+      - MASTER_INTERNAL_IP=master
+    command: master
     ports:
       - "80:80"
+  game1:
+    image: minextu/ssc-server
+    build: .
+    env_file: ".env"
+    environment:
+      - MASTER_INTERNAL_IP=master
+    command: game 1 -p 8085
+    ports:
       - "8085:8085/udp"
+  game2:
+    image: minextu/ssc-server
+    build: .
+    env_file: ".env"
+    environment:
+    - MASTER_INTERNAL_IP=master
+    command: game 2 -p 8086
+    ports:
+      - "8086:8086/udp"
+  game3:
+    image: minextu/ssc-server
+    build: .
+    env_file: ".env"
+    environment:
+      - MASTER_INTERNAL_IP=master
+    command: game 3 -p 8087
+    ports:
+      - "8087:8087/udp"

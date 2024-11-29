@@ -1,16 +1,16 @@
 import http from 'node:http'
 import { server as WebSocketServer } from 'websocket'
-import { players } from '../game/player.js'
-import { shots } from '../game/trackShots.js'
+import { players } from '../game/state/player.js'
+import { shots } from '../game/state/shot.js'
 
-export const server = http.createServer((request, response) => {
+export const websocketDebugServer = http.createServer((request, response) => {
   console.log(`${new Date()} Received request for ${request.url}`)
   response.writeHead(404)
   response.end()
 })
 
 export const wsServer = new WebSocketServer({
-  httpServer: server,
+  httpServer: websocketDebugServer,
   // You should not use autoAcceptConnections for production
   // applications, as it defeats all standard cross-origin protection
   // facilities built into the protocol and the browser.  You should

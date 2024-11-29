@@ -1,9 +1,9 @@
-import { ARMOR_DAMAGE_PERCENTAGE, modelDimensions, shotDimensions, WEAPON1_DAMAGE, WEAPON2_DAMAGE, WEAPON3_DAMAGE, WEAPON4_DAMAGE, WEAPON5_DAMAGE, WEAPON9_DAMAGE } from '../constants.js'
-import { FIGURE_SOUND, GAME_STATE_TYPE, WEAPON } from '../enums.js'
-import { intToStr } from '../utils/convert.js'
-import { log } from '../utils/logging.js'
-import { rnd, seedRnd } from '../utils/random.js'
-import { sendGameStateToAll } from './outbound.js'
+import { ARMOR_DAMAGE_PERCENTAGE, modelDimensions, shotDimensions, WEAPON1_DAMAGE, WEAPON2_DAMAGE, WEAPON3_DAMAGE, WEAPON4_DAMAGE, WEAPON5_DAMAGE, WEAPON9_DAMAGE } from '../../constants.js'
+import { FIGURE_SOUND, GAME_STATE_TYPE, WEAPON } from '../../enums.js'
+import { intToStr } from '../../utils/convert.js'
+import { log } from '../../utils/logging.js'
+import { rnd, seedRnd } from '../../utils/random.js'
+import { sendGameStateToAll } from '../utils/outbound.js'
 import { players } from './player.js'
 
 export interface Shot {

@@ -30,8 +30,8 @@ if (!MASTER_SECRET || GAME_SECRETS?.length !== 9) {
   process.exit(1)
 }
 
-export const MAX_PLAYERS = 8
-export const TIMEOUT_PERIOD = 0x3A98
+export const DEFAULT_MAX_PLAYERS = 8
+export const DEFAULT_TIMEOUT_PERIOD = 0x3A98
 export const HOST_ID = 1
 
 // should be half according to
@@ -48,3 +48,8 @@ export const WEAPON9_DAMAGE = Number(process.env.WEAPON9_DAMAGE ?? 10)
 // documentation only mentions it should reduce by a bit
 // https://www.helles-koepfchen.de/online_spiele/super_soaker_championship/index.html
 export const TOWEL_HEALTH = Number(process.env.TOWEL_HEALTH ?? 70)
+
+// game server to master server connection
+export const MASTER_INTERNAL_IP = process.env.MASTER_INTERNAL_IP ?? '127.0.0.1'
+export const MASTER_INTERNAL_PORT = Number(process.env.MASTER_INTERNAL_PORT ?? 8080)
+export const GAME_EXTERNAL_IP = process.env.GAME_EXTERNAL_IP ?? '127.0.0.1'
