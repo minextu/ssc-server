@@ -12,6 +12,11 @@ export function masterDecryptString(encrStr: string) {
   }
 
   const rnd = encryptedStage1.slice(-1).charCodeAt(0) - 1
+  if (rnd >= MASTER_SECRET.length || rnd < 0) {
+    console.log('can\'t decrypt, rnd value invalid')
+    return
+  }
+
   encryptedStage1 = encryptedStage1.slice(0, -1)
 
   let decryptedString = ''
@@ -93,6 +98,10 @@ export function gameDecryptBuffer(buffer: Buffer) {
   // sometimes returning 0, which in blitz3d would be invalid and not encrypting anything
   if (rnd === 0) {
     return str.map(char => String.fromCharCode(char)).join('')
+  }
+  else if (rnd < 0 || rnd >= GAME_SECRETS.length) {
+    console.log('can\'t decrypt, rnd value invalid')
+    return
   }
 
   // blitz3d starts array index from 1

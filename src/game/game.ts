@@ -17,8 +17,10 @@ export function setupGameServer(...settings: Parameters<typeof setGameSettings>)
 
   let requestId = 0
   gameServer.on('message', (data, info) => {
-    requestId++
     const message = gameDecryptBuffer(data)
+    if (!message) {
+      return
+    }
 
     const packetType = strToInt(message, 1)
     const target = strToInt(message[1], 1)
@@ -30,6 +32,7 @@ export function setupGameServer(...settings: Parameters<typeof setGameSettings>)
       player.lastHeard = Date.now()
     }
 
+    requestId++
     populateLogContext(requestId, { message, packetType, target, messageData, player, data })
     handleMessage(requestId, packetType, messageData, info, target, player)
     flushLog(requestId)

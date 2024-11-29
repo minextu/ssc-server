@@ -26,7 +26,20 @@ export const masterServer = net.createServer((socket) => {
       return
     }
 
+    if (str.includes('HTTP')) {
+      socket.write(
+        'HTTP/1.0 501 Not Implemented\r\n'
+        + '\r\n',
+      )
+      socket.end()
+      return
+    }
+
     const message = masterDecryptString(str)
+    if (!message) {
+      return
+    }
+
     console.log(chalk.gray(`MASTER IN: ${JSON.stringify(message)}`))
 
     const operation = strToInt(message, 1)

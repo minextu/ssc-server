@@ -17,6 +17,10 @@ export function intToStr(num: number, len = 4) {
  * Converts compresed string back to an Integer
  */
 export function strToInt(str: string, len = 4) {
+  if (str === undefined) {
+    return 0
+  }
+
   let number = 0
 
   for (let index = 0; index < len; index++) {
