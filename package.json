@@ -12,7 +12,8 @@
   "scripts": {
     "dev:master": "tsx watch src/index.ts master",
     "dev:game": "tsx watch src/index.ts game",
-    "dev": "concurrently 'pnpm dev:master' 'pnpm dev:game 2 --debug-server'",
+    "dev:patch": "tsx watch src/index.ts patch",
+    "dev": "concurrently 'pnpm dev:patch' 'pnpm dev:master' 'pnpm dev:game 2 --debug-server'",
     "start": "node dist/src/index.js",
     "build": "tsc",
     "type-check": "tsc --noEmit",

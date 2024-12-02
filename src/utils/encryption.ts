@@ -1,10 +1,15 @@
 import { Buffer } from 'node:buffer'
-import { GAME_SECRETS, MASTER_SECRET } from '../constants.js'
+import { GAME_SECRETS, MASTER_SECRET, PATCH_SECRET } from '../constants.js'
+
+export const masterDecryptString = (encrString: string) => decryptStringSingle(encrString, MASTER_SECRET)
+export const masterEncryptString = (encrString: string) => encryptStringSingle(encrString, MASTER_SECRET)
+export const patchDecryptString = (encrString: string) => decryptStringSingle(encrString, PATCH_SECRET)
+export const patchEncryptString = (encrString: string) => encryptStringSingle(encrString, PATCH_SECRET)
 
 /**
- * Decrypts the given string using masterSecret
+ * Decrypts the given string using a single secret string
  */
-export function masterDecryptString(encrStr: string) {
+function decryptStringSingle(encrStr: string, secret: string) {
   let encryptedStage1 = ''
   for (let i = 0; i < encrStr.length; i += 3) {
     const result1 = String.fromCharCode(Number(encrStr.slice(i, i + 3)) - 0x124)
@@ -12,7 +17,7 @@ export function masterDecryptString(encrStr: string) {
   }
 
   const rnd = encryptedStage1.slice(-1).charCodeAt(0) - 1
-  if (rnd >= MASTER_SECRET.length || rnd < 0) {
+  if (rnd >= secret.length || rnd < 0) {
     console.log('can\'t decrypt, rnd value invalid')
     return
   }
@@ -22,9 +27,9 @@ export function masterDecryptString(encrStr: string) {
   let decryptedString = ''
   let currentRnd = rnd
   for (let i = 0; i < encryptedStage1.length; i++) {
-    decryptedString += String.fromCharCode(encryptedStage1[i].charCodeAt(0) ^ MASTER_SECRET[currentRnd].charCodeAt(0))
+    decryptedString += String.fromCharCode(encryptedStage1[i].charCodeAt(0) ^ secret[currentRnd].charCodeAt(0))
     currentRnd += 1
-    if (currentRnd >= MASTER_SECRET.length) {
+    if (currentRnd >= secret.length) {
       currentRnd = 0
     }
   }
@@ -33,19 +38,19 @@ export function masterDecryptString(encrStr: string) {
 }
 
 /**
- * Encrypts the given string using masterSecret
+ * Encrypts the given string using a single secret string
  */
-export function masterEncryptString(str: string) {
-  const max = MASTER_SECRET.length - 2
+function encryptStringSingle(str: string, secret: string) {
+  const max = secret.length - 2
   const min = 0
   const rnd = Math.floor(Math.random() * (max - min + 1) + min)
 
   let encryptedStage1 = ''
   let currentRnd = rnd
   for (let i = 0; i < str.length; i++) {
-    encryptedStage1 += String.fromCharCode(str[i].charCodeAt(0) ^ MASTER_SECRET[currentRnd].charCodeAt(0))
+    encryptedStage1 += String.fromCharCode(str[i].charCodeAt(0) ^ secret[currentRnd].charCodeAt(0))
     currentRnd += 1
-    if (currentRnd >= MASTER_SECRET.length) {
+    if (currentRnd >= secret.length) {
       currentRnd = 0
     }
   }

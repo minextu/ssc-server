@@ -1,16 +1,18 @@
 /* eslint-disable perfectionist/sort-imports */
 import 'dotenv/config'
-import { gameServer, setupGameServer } from './game/game.js'
+import { setupGameServer } from './game/game.js'
 import { masterServer } from './master/master.js'
 import { Argument, program } from 'commander'
 import { websocketDebugServer } from './debug-client/websocket-server.js'
 import { gameBridgeServer } from './master/game-bridge.js'
 import { DEFAULT_MAX_PLAYERS, DEFAULT_TIMEOUT_PERIOD, MASTER_INTERNAL_IP, MASTER_INTERNAL_PORT } from './constants.js'
+import { patchServer } from './patch/patch.js'
+import { patchWebServer } from './patch/patch-webserver.js'
 
 program
   .command('master')
   .description('host the master server')
-  .option('-p,--port <port>', 'tcp port to host the game server', '80')
+  .option('-p,--port <port>', 'tcp port to host the game server (unpatched executable expects port 80)', '81')
   .action(({ port }) => {
     masterServer.listen(Number(port), '0.0.0.0')
     gameBridgeServer.listen(MASTER_INTERNAL_PORT, MASTER_INTERNAL_IP)
@@ -28,11 +30,21 @@ program.command('game')
     setupGameServer(Number(port), Number(level), Number(type), Number(maxPlayers), Number(timeout))
 
     if (debugServer) {
-      const debugServerPort = 8081
+      const debugServerPort = 8082
       websocketDebugServer.listen(debugServerPort, () => {
         console.log(`Debug Websocket Server listening on port ${debugServerPort}`)
       })
     }
+  })
+
+program
+  .command('patch')
+  .description('host the patch server')
+  .option('-p,--port <port>', 'tcp port to host the patch server', '8080')
+  .option('-wp,--webserver-port <port>', 'tcp port to host the patch webserver at', '80')
+  .action(({ port, webserverPort }) => {
+    patchServer.listen(Number(port), '0.0.0.0')
+    patchWebServer.listen(Number(webserverPort), '0.0.0.0')
   })
 
 program.parse()

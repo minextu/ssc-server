@@ -2,8 +2,8 @@ import process from 'node:process'
 import chalk from 'chalk'
 import { FIGUR, WEAPON } from './enums.js'
 
-// latest version ever released
-export const VERSION = '1.35'
+// 1.35 seems to be the latest version ever released
+export const VERSION = process.env.SERVER_VERSION ?? '1.35'
 
 // extracted these from the models (i.e. models/herr_wolf_dds.b3d), then applied the scaling of 0.013
 export const modelDimensions: Record<FIGUR, { x: number, y: number, z: number, scale: number }> = {
@@ -23,10 +23,11 @@ export const shotDimensions: Record<WEAPON, { x: number, y: number, z: number, s
 
 // get these from a hexdump from the original game file
 export const MASTER_SECRET = process.env.MASTER_SECRET ?? ''
+export const PATCH_SECRET = process.env.PATCH_SECRET ?? ''
 export const GAME_SECRETS = process.env.GAME_SECRETS?.split(',') ?? []
-if (!MASTER_SECRET || GAME_SECRETS?.length !== 9) {
+if (!MASTER_SECRET || !PATCH_SECRET || GAME_SECRETS?.length !== 9) {
   console.log(GAME_SECRETS)
-  console.error(chalk.red('Error: please provide valid MASTER_SECRET and GAME_SECRETS env variables'))
+  console.error(chalk.red('Error: please provide valid MASTER_SECRET, PATCH_SECRET and GAME_SECRETS env variables'))
   process.exit(1)
 }
 
@@ -51,5 +52,10 @@ export const TOWEL_HEALTH = Number(process.env.TOWEL_HEALTH ?? 70)
 
 // game server to master server connection
 export const MASTER_INTERNAL_IP = process.env.MASTER_INTERNAL_IP ?? '127.0.0.1'
-export const MASTER_INTERNAL_PORT = Number(process.env.MASTER_INTERNAL_PORT ?? 8080)
+export const MASTER_INTERNAL_PORT = Number(process.env.MASTER_INTERNAL_PORT ?? 8081)
 export const GAME_EXTERNAL_IP = process.env.GAME_EXTERNAL_IP ?? '127.0.0.1'
+
+// patch server versions
+export const PATCH_SUPERSOAKER_VERSION = process.env.PATCH_SUPERSOAKER_VERSION ?? '1.40'
+export const PATCH_DATA_VERSIONS = (process.env.PATCH_DATA_VERSIONS ?? '1.40,1.40').split(',')
+export const PATCH_BANNER_VERSION = process.env.PATCH_BANNER_VERSION ?? '1.35'

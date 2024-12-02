@@ -1,4 +1,16 @@
 services:
+  patch:
+    image: minextu/ssc-server
+    build: .
+    restart: on-failure
+    env_file: ".env"
+    command: patch
+    volumes:
+      - ./public:/app/dist/public
+    ports:
+      - "80:80"
+      - "8080:8080"
+
   master:
     image: minextu/ssc-server
     build: .
@@ -8,7 +20,8 @@ services:
       - MASTER_INTERNAL_IP=master
     command: master
     ports:
-      - "80:80"
+      - "81:81"
+
   game1:
     image: minextu/ssc-server
     build: .
@@ -19,6 +32,7 @@ services:
     command: game 1 -p 8085
     ports:
       - "8085:8085/udp"
+
   game2:
     image: minextu/ssc-server
     build: .
@@ -29,6 +43,7 @@ services:
     command: game 2 -p 8086
     ports:
       - "8086:8086/udp"
+
   game3:
     image: minextu/ssc-server
     build: .
