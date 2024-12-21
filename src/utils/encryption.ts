@@ -104,7 +104,7 @@ export function gameDecryptBuffer(buffer: Buffer) {
   if (rnd === 0) {
     return str.map(char => String.fromCharCode(char)).join('')
   }
-  else if (rnd < 0 || rnd >= GAME_SECRETS.length) {
+  else if (rnd < 0 || rnd > GAME_SECRETS.length) {
     console.log('can\'t decrypt, rnd value invalid')
     return
   }
