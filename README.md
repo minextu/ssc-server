@@ -15,8 +15,8 @@ After this you should be able to start the game and let the Patcher (`Start.exe`
 ### Optional: Update the game files manually
 In case the Patcher is not working correctly you can bypass it:
 
-1. Download the original updated game files here: https://archive.org/download/super-soaker-championship_140/data_2.dat, https://archive.org/download/super-soaker-championship_140/data_3.dat and https://archive.org/download/super-soaker-championship_140/pv.dat
-2. Download the patched game exectuable here: https://github.com/minextu/ssc-server/releases/download/v0.1/SuperSoaker.exe
+1. Download the original updated game files here: [data_2.dat](https://github.com/minextu/ssc-server/releases/download/v0.1/data_2.dat), [data_3.dat](https://github.com/minextu/ssc-server/releases/download/v0.1/data_3.dat) and [pv.dat](https://github.com/minextu/ssc-server/releases/download/v0.1/pv.dat)
+2. Download the patched game exectuable here: [SuperSoaker.exe](https://github.com/minextu/ssc-server/releases/download/v0.1/SuperSoaker.exe)
 3. Place all of these files (`data_2.dat`, `data_3.dat`, `pv.dat`, `SuperSoaker.exe`) into the installation folder (i.e. `C:\Program Files (x86)\Super Soaker Championship`) and override the existing files.
 4. You can now bypass the Patcher by running `SuperSoaker.exe` directly instead of the desktop shortcut or `Start.exe`.
 
