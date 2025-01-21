@@ -57,3 +57,7 @@ patchServer.on('listening', () => {
   const ipaddr = address.address
   console.log(`Patch Server is listening at ${ipaddr} port ${port}`)
 })
+
+patchServer.on('error', (error) => {
+  console.log(chalk.red(`PATCH ERROR: ${error}`))
+})

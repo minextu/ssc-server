@@ -83,3 +83,7 @@ masterServer.on('listening', () => {
   const ipaddr = address.address
   console.log(`Master Server is listening at ${ipaddr} port ${port}`)
 })
+
+masterServer.on('error', (error) => {
+  console.log(chalk.red(`MASTER ERROR: ${error}`))
+})
