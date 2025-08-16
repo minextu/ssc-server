@@ -54,4 +54,5 @@ Then either run the server through docker (https://hub.docker.com/repository/doc
     - Collision detection is handled on the server, there is a very basic detection [here](https://github.com/minextu/ssc-server/blob/0e849d6247f02cec1e294a9c61d4b29609069975/src/game/state/shot.ts#L220) but currently this is not working like it should, causing shots to be missed.
 - [ ] Figure out weapon damages
     - Each weapon has it's own damage value. But since this was only ever calculated on the server, the actual damage each weapon used to do is unknown.
-- [ ] Kick and Ban functionality
+- [x] Kick functionality
+- [ ] IP Banning

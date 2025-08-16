@@ -92,7 +92,8 @@ export enum GAME_STATE_TYPE {
   SOUND = 22,
   CHAT = 23,
   ALL_SCORE = 24,
-  KICKED = 89,
+  KICK_REQUEST = 88,
+  SELF_KICKED = 89,
 }
 
 export enum FIGURE_SOUND {

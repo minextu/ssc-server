@@ -65,16 +65,20 @@ export function sendGameStateToAll(gameStateType: GAME_STATE_TYPE, messageData: 
  */
 export function sendQueuedGameStateMessages() {
   for (const player of players) {
-    player.udp.packetsToSend.forEach((packet) => {
-      // this has been sent recently already
-      if (Date.now() - packet.lastSend.getTime() < 33 * 25) {
-        return
-      }
-
-      gameServer.send(gameEncryptString(packet.message), player.port, player.address)
-      packet.lastSend = new Date()
-    })
+    sendQueuedGameStateMessagesForPlayer(player)
   }
+}
+
+export function sendQueuedGameStateMessagesForPlayer(player: Player) {
+  player.udp.packetsToSend.forEach((packet) => {
+    // this has been sent recently already
+    if (Date.now() - packet.lastSend.getTime() < 33 * 25) {
+      return
+    }
+
+    gameServer.send(gameEncryptString(packet.message), player.port, player.address)
+    packet.lastSend = new Date()
+  })
 }
 
 export function updatePositions() {

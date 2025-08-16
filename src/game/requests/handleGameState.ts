@@ -1,12 +1,12 @@
 import type { FIGUR, WEAPON } from '../../enums.js'
-import { TOWEL_HEALTH } from '../../constants.js'
-import { FIGURE_SOUND, GAME_PACKET, GAME_STATE_TYPE, GAME_TYPE, ITEM_TYPE } from '../../enums.js'
+import { HOST_ID, TOWEL_HEALTH } from '../../constants.js'
+import { FIGURE_SOUND, GAME_PACKET, GAME_STATE_TYPE, GAME_TYPE, ITEM_TYPE, LEAVE_TYPE } from '../../enums.js'
 import { intToStr, strToInt } from '../../utils/convert.js'
 import { extendLogContext, log } from '../../utils/logging.js'
-import { type Player, players } from '../state/player.js'
+import { type Player, players, removePlayer } from '../state/player.js'
 import { gameSettings } from '../state/settings.js'
 import { fire } from '../state/shot.js'
-import { sendGameStateResponse, sendGameStateToAll, sendResponse } from '../utils/outbound.js'
+import { sendGameStateResponse, sendGameStateToAll, sendResponse, sendToAll, sendToPlayer } from '../utils/outbound.js'
 
 export function handleGameState(requestId: number, player: Player, message: string) {
   const gameStateType = strToInt(message, 2)
@@ -153,6 +153,28 @@ export function handleGameState(requestId: number, player: Player, message: stri
       const otherTeamPlayers = gameSettings.type === GAME_TYPE.TEAM && targetTeam !== 3 ? players.filter(p => p.team !== player.team) : undefined
 
       sendGameStateToAll(GAME_STATE_TYPE.CHAT, text + intToStr(player.netId, 1), otherTeamPlayers, requestId)
+      break
+    }
+    case GAME_STATE_TYPE.KICK_REQUEST: {
+      const targetNetId = strToInt(messageData, 1)
+
+      const targetPlayer = players.find(p => p.netId === targetNetId)
+      if (!targetPlayer) {
+        log(`player '${targetNetId}' couldn't be found. Not kicking...`, 'warning', requestId)
+        sendGameStateResponse(GAME_STATE_TYPE.CHAT, `Player not found${intToStr(HOST_ID, 1)}`, player, requestId)
+        break
+      }
+
+      // this doesn't seem to be processed by the game, so we send a custom leave message instead
+      // sendToAll(GAME_PACKET.PLAYER_KICKED, intToStr(targetPlayer.netId, 1) + intToStr(targetPlayer.netId, 1), undefined, requestId)
+      sendGameStateToAll(GAME_STATE_TYPE.CHAT, `Spieler ${targetPlayer.name} wurde gekickt.${intToStr(HOST_ID, 1)}`, undefined, requestId)
+      sendToAll(GAME_PACKET.PLAYER_LEFT, intToStr(targetNetId, 1) + intToStr(LEAVE_TYPE.LOST, 1))
+
+      // show kick status for target player and remove
+      sendGameStateResponse(GAME_STATE_TYPE.SELF_KICKED, '', targetPlayer, requestId)
+      removePlayer(targetPlayer.netId)
+
+      log(`player ${targetPlayer.name} (${targetPlayer.netId}) was kicked`, 'warning', requestId)
       break
     }
     default:
