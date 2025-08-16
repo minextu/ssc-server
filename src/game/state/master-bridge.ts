@@ -1,4 +1,4 @@
-import type { GameSettings } from './settings.js'
+import type { MasterBridgePacket } from '../../master/game-bridge.js'
 import net from 'node:net'
 import { GAME_EXTERNAL_IP, MASTER_INTERNAL_IP, MASTER_INTERNAL_PORT } from '../../constants.js'
 import { log } from '../../utils/logging.js'
@@ -9,11 +9,6 @@ let connectTimeout: NodeJS.Timeout
 let updateInterval: NodeJS.Timeout
 
 const masterClient = new net.Socket()
-
-export type MasterBridgePacket = GameSettings & {
-  currentPlayers: number
-  ip: string
-}
 
 export function connectToMasterServer() {
   log('connecting to master server...', 'info')
@@ -26,7 +21,15 @@ masterClient.on('connect', () => {
 
   clearInterval(updateInterval)
   updateInterval = setInterval(() => {
-    masterClient.write(JSON.stringify({ ...gameSettings, currentPlayers: players.length, ip: GAME_EXTERNAL_IP } satisfies MasterBridgePacket))
+    masterClient.write(JSON.stringify(
+      {
+        ...gameSettings,
+        packetType: 'GAME_UPDATE',
+        currentPlayers: players.length,
+        ip: GAME_EXTERNAL_IP,
+
+      } satisfies MasterBridgePacket,
+    ))
   }, 1000)
 })
 

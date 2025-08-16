@@ -1,6 +1,16 @@
-import type { MasterBridgePacket } from '../game/state/master-bridge.js'
+import type { GameSettings } from '../game/state/settings.js'
 import net from 'node:net'
 import chalk from 'chalk'
+
+export interface MasterInfoPacket {
+  packetType: 'INFO'
+}
+
+export type MasterBridgePacket = GameSettings & {
+  packetType: 'GAME_UPDATE'
+  currentPlayers: number
+  ip: string
+}
 
 export const servers: (MasterBridgePacket & { lastHeard: number })[] = []
 
@@ -9,19 +19,38 @@ export const servers: (MasterBridgePacket & { lastHeard: number })[] = []
  */
 export const gameBridgeServer = net.createServer((socket) => {
   socket.on('data', (data) => {
-    const server = JSON.parse(data.toString()) as MasterBridgePacket
-    if (!('port' in server) || !('ip' in server)) {
-      console.log(chalk.red('MASTER: invalid game server packet received'), server)
+    let server: MasterBridgePacket | MasterInfoPacket
+    try {
+      server = JSON.parse(data.toString())
+    }
+    catch (err) {
+      console.log(chalk.red(`MASTER BRIDGE: receive error`, err))
       return
     }
 
-    let index = servers.findIndex(s => s.ip === server.ip && s.port === server.port)
-    if (index === -1) {
-      index = servers.length
-      console.log(chalk.whiteBright('MASTER: game server added'), server)
+    // external info request, return list of servers (i.e. for outside projects)
+    if (server.packetType === 'INFO') {
+      socket.write(JSON.stringify(servers))
+      socket.end()
     }
+    // new game server started, add it to the list
+    else if (server.packetType === 'GAME_UPDATE') {
+      if (!('port' in server) || !('ip' in server)) {
+        console.log(chalk.red('MASTER BRIDGE: invalid game server packet received'), server)
+        return
+      }
 
-    servers[index] = { ...server, lastHeard: Date.now() }
+      let index = servers.findIndex(s => s.ip === server.ip && s.port === server.port)
+      if (index === -1) {
+        index = servers.length
+        console.log(chalk.whiteBright('MASTER BRIDGE: game server added'), server)
+      }
+
+      servers[index] = { ...server, lastHeard: Date.now() }
+    }
+    else {
+      console.log(chalk.red(`MASTER BRIDGE: Invalid packet type ${(server as any)?.packetType ?? '??'}`))
+    }
   })
 })
 
