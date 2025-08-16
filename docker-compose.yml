@@ -54,3 +54,47 @@ services:
     command: game 3 -p 8087
     ports:
       - "8087:8087/udp"
+
+  teamgame1:
+    image: minextu/ssc-server
+    build: .
+    restart: on-failure
+    env_file: ".env"
+    environment:
+      - MASTER_INTERNAL_IP=master
+    command: game 1 2 -p 8088
+    ports:
+      - "8088:8088/udp"
+
+  teamgame2:
+    image: minextu/ssc-server
+    build: .
+    restart: on-failure
+    env_file: ".env"
+    environment:
+      - MASTER_INTERNAL_IP=master
+    command: game 2 2 -p 8089
+    ports:
+      - "8089:8089/udp"
+
+  teamgame3:
+    image: minextu/ssc-server
+    build: .
+    restart: on-failure
+    env_file: ".env"
+    environment:
+      - MASTER_INTERNAL_IP=master
+    command: game 3 2 -p 8090
+    ports:
+      - "8090:8090/udp"
+
+  teamgame4:
+    image: minextu/ssc-server
+    build: .
+    restart: on-failure
+    env_file: ".env"
+    environment:
+      - MASTER_INTERNAL_IP=master
+    command: game 4 2 -p 8091
+    ports:
+      - "8091:8091/udp"

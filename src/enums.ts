@@ -76,7 +76,7 @@ export const POSITION_UPDATE_TYPE = {
 
 export enum GAME_STATE_TYPE {
   NEW_PLAYER = 4,
-  NEW_PLAYER_TEAM = 5,
+  TEAM_UPDATE = 5,
   GAME_STATE = 6,
   PLAYER_READY = 7,
   GAME_TIME = 8,

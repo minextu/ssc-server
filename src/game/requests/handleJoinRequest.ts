@@ -1,5 +1,5 @@
 import { HOST_ID } from '../../constants.js'
-import { GAME_PACKET, GAME_STATE_TYPE, JOIN_FAIL_REASON, JOIN_TYPE } from '../../enums.js'
+import { GAME_PACKET, GAME_STATE_TYPE, GAME_TYPE, JOIN_FAIL_REASON, JOIN_TYPE } from '../../enums.js'
 import { intToStr, strToInt } from '../../utils/convert.js'
 import { log } from '../../utils/logging.js'
 import { addPlayer, findPlayerByAddress, findPlayerByName, players } from '../state/player.js'
@@ -69,6 +69,15 @@ export function handleJoinRequest(requestId: number, messageData: string, info: 
     if (!player) {
       log('Join failed, player not found', 'error', requestId)
       return
+    }
+
+    // assign player to the team with the least players
+    if (gameSettings.type === GAME_TYPE.TEAM) {
+      const playersPerTeam = players
+        .filter(p => !p.connecting)
+        // count amount of players per team
+        .reduce((prev, current) => prev.set(current.team, (prev.get(current.team) ?? 0) + 1), new Map())
+      player.team = (playersPerTeam.get(0) ?? 0) > (playersPerTeam.get(1) ?? 0) ? 1 : 0
     }
 
     player.connecting = false

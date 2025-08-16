@@ -1,9 +1,10 @@
 import type { FIGUR, WEAPON } from '../../enums.js'
 import { TOWEL_HEALTH } from '../../constants.js'
-import { FIGURE_SOUND, GAME_PACKET, GAME_STATE_TYPE, ITEM_TYPE } from '../../enums.js'
+import { FIGURE_SOUND, GAME_PACKET, GAME_STATE_TYPE, GAME_TYPE, ITEM_TYPE } from '../../enums.js'
 import { intToStr, strToInt } from '../../utils/convert.js'
 import { extendLogContext, log } from '../../utils/logging.js'
 import { type Player, players } from '../state/player.js'
+import { gameSettings } from '../state/settings.js'
 import { fire } from '../state/shot.js'
 import { sendGameStateResponse, sendGameStateToAll, sendResponse } from '../utils/outbound.js'
 
@@ -28,7 +29,22 @@ export function handleGameState(requestId: number, player: Player, message: stri
   switch (gameStateType) {
     case GAME_STATE_TYPE.PLAYER_READY: {
       // broadcast gamestate login to other players with correct figur attached
-      sendGameStateToAll(GAME_STATE_TYPE.NEW_PLAYER, intToStr(player.netId, 2) + intToStr(player.figur, 2), player, requestId)
+      if (gameSettings.type === GAME_TYPE.NORMAL) {
+        sendGameStateToAll(GAME_STATE_TYPE.NEW_PLAYER, intToStr(player.netId, 2) + intToStr(player.figur, 2), player, requestId)
+      }
+
+      // update teams
+      if (gameSettings.type === GAME_TYPE.TEAM) {
+        const allPlayers = players.filter(p => !p.connecting)
+        sendGameStateToAll(
+          GAME_STATE_TYPE.TEAM_UPDATE,
+          intToStr(player.netId, 2) + intToStr(allPlayers.length, 2) + allPlayers.map(
+            p => intToStr(p.netId, 2) + intToStr(0, 2) + intToStr(p.figur, 2) + intToStr(p.team, 2),
+          ).join(''),
+          undefined,
+          requestId,
+        )
+      }
 
       // update score
       const otherPlayers = players.filter(p => !p.connecting)
@@ -54,7 +70,7 @@ export function handleGameState(requestId: number, player: Player, message: stri
 
       log(`shoot`, 'info', requestId, { weapon, entityX, entityY, entityZ, rposX, rposY, deathCounter })
 
-      const shot = fire(requestId, player.netId, weapon, entityX, entityY, entityZ, rposX, rposY)
+      const shot = fire(requestId, player.netId, player.team, weapon, entityX, entityY, entityZ, rposX, rposY)
       if (!shot) {
         break
       }

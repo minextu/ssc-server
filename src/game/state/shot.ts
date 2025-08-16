@@ -1,14 +1,16 @@
 import { ARMOR_DAMAGE_PERCENTAGE, modelDimensions, shotDimensions, WEAPON1_DAMAGE, WEAPON2_DAMAGE, WEAPON3_DAMAGE, WEAPON4_DAMAGE, WEAPON5_DAMAGE, WEAPON9_DAMAGE } from '../../constants.js'
-import { FIGURE_SOUND, GAME_STATE_TYPE, WEAPON } from '../../enums.js'
+import { FIGURE_SOUND, GAME_STATE_TYPE, GAME_TYPE, WEAPON } from '../../enums.js'
 import { intToStr } from '../../utils/convert.js'
 import { log } from '../../utils/logging.js'
 import { rnd, seedRnd } from '../../utils/random.js'
 import { sendGameStateToAll } from '../utils/outbound.js'
 import { players } from './player.js'
+import { gameSettings } from './settings.js'
 
 export interface Shot {
   netId: number
   shotId: number
+  team: number
   weapon: WEAPON
   entityX: number
   entityY: number
@@ -30,7 +32,7 @@ export interface Shot {
 let shotId = 1
 export const shots: Shot[] = []
 
-export function fire(requestId: number, netId: number, weapon: WEAPON | 10 | 11, entityX: number, entityY: number, entityZ: number, rposX: number, rposY: number, isRecursive = false) {
+export function fire(requestId: number, netId: number, team: number, weapon: WEAPON | 10 | 11, entityX: number, entityY: number, entityZ: number, rposX: number, rposY: number, isRecursive = false) {
   shotId++
   if (shotId > 40000) {
     shotId = 1
@@ -116,10 +118,10 @@ export function fire(requestId: number, netId: number, weapon: WEAPON | 10 | 11,
     case WEAPON.WASSERBOMBEN_EXPLOSION:
       // this is a bomb explosion, we need to create 24 + 10
       for (let i = 1; i <= 24; i++) {
-        fire(requestId, netId, 10, entityX, entityY, entityZ, rposX, rposY)
+        fire(requestId, netId, team, 10, entityX, entityY, entityZ, rposX, rposY)
       }
       for (let i = 1; i <= 10; i++) {
-        fire(requestId, netId, 11, entityX, entityY, entityZ, rposX, rposY)
+        fire(requestId, netId, team, 11, entityX, entityY, entityZ, rposX, rposY)
       }
       return { shotId }
 
@@ -157,6 +159,7 @@ export function fire(requestId: number, netId: number, weapon: WEAPON | 10 | 11,
 
   const shot: Shot = {
     netId,
+    team,
     shotId,
     weapon,
     entityX,
@@ -192,7 +195,9 @@ export function trackShots() {
     for (const player of players) {
       if (player.connecting || !player.position || player.deadCooldown > 0
         // self hit only possible with baloon bomb
-        || player.netId === shot.netId && shot.weapon !== WEAPON.WASSERBOMBEN_EXPLOSION
+        || (player.netId === shot.netId && shot.weapon !== WEAPON.WASSERBOMBEN_EXPLOSION)
+        // friendly fire is disabled
+        || (gameSettings.type === GAME_TYPE.TEAM && player.team === shot.team && player.netId !== shot.netId)
       ) {
         continue
       }

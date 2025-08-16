@@ -17,6 +17,7 @@ export interface Player {
   score: number
   naessegrad: number
   alive: boolean
+  team: number
 
   position?: {
     xpos: number
@@ -69,6 +70,7 @@ export function addPlayer(name: string, info: { address: string, port: number },
     address: info.address,
     port: info.port,
     netId,
+    team: 1,
     connecting: true,
     lastHeard: Date.now(),
     figur: FIGUR.HERR_WOLF,
@@ -136,5 +138,7 @@ export function processPlayerTimeouts() {
 }
 
 export function processPlayerCooldowns() {
-  players.forEach((p) => { p.deadCooldown = Math.max(0, p.deadCooldown - 1) })
+  players.forEach((p) => {
+    p.deadCooldown = Math.max(0, p.deadCooldown - 1)
+  })
 }
