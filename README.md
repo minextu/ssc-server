@@ -10,7 +10,10 @@ This allows the game to be played again, since the server went offline quite som
 4. Open the installation folder (i.e. `C:\Program Files (x86)\Super Soaker Championship`)
 5. Copy the downloaded `Start.exe` into this folder (override the existing one)
 
-After this you should be able to start the game and let the Patcher (`Start.exe`) download the rest. In case the Patcher crashes or fails to download the remaining files, follow the next step and update the game manually.
+After this you should be able to start the game and let the Patcher (`Start.exe`) download the rest. 
+
+> [!NOTE]
+> If the Patcher crashes or fails to download the remaining files, try running it as Administrator. Alternatively you can follow the next step and update the game manually.
 
 ### Optional: Update the game files manually
 In case the Patcher is not working correctly you can bypass it:
