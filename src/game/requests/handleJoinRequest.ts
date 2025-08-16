@@ -71,15 +71,6 @@ export function handleJoinRequest(requestId: number, messageData: string, info: 
       return
     }
 
-    // assign player to the team with the least players
-    if (gameSettings.type === GAME_TYPE.TEAM) {
-      const playersPerTeam = players
-        .filter(p => !p.connecting)
-        // count amount of players per team
-        .reduce((prev, current) => prev.set(current.team, (prev.get(current.team) ?? 0) + 1), new Map())
-      player.team = (playersPerTeam.get(0) ?? 0) > (playersPerTeam.get(1) ?? 0) ? 1 : 0
-    }
-
     player.connecting = false
 
     sendToAll(
@@ -87,7 +78,7 @@ export function handleJoinRequest(requestId: number, messageData: string, info: 
       intToStr(JOIN_TYPE.SUCCESS, 1)
       + intToStr(player.netId, 1)
       + player.name,
-      player,
+      [player],
       requestId,
     )
 

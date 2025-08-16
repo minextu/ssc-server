@@ -1,7 +1,7 @@
 import { FIGUR, GAME_PACKET, LEAVE_TYPE, WEAPON } from '../../enums.js'
 import { intToStr } from '../../utils/convert.js'
 import { log } from '../../utils/logging.js'
-import { sendToAll, sendToPlayer } from '../utils/outbound.js'
+import { sendQueuedGameStateMessagesForPlayer, sendToAll, sendToPlayer } from '../utils/outbound.js'
 import { gameSettings } from './settings.js'
 
 export interface Player {
@@ -64,13 +64,19 @@ export function addPlayer(name: string, info: { address: string, port: number },
     return
   }
 
+  // count amount of players per team
+  const playersPerTeam = players
+    .reduce((prev, current) => prev.set(current.team, (prev.get(current.team) ?? 0) + 1), new Map())
+  // assign player to the team with the least players
+  const team = (playersPerTeam.get(0) ?? 0) > (playersPerTeam.get(1) ?? 0) ? 1 : 0
+
   const player: Player = {
     name,
     alive: true,
     address: info.address,
     port: info.port,
     netId,
-    team: 1,
+    team,
     connecting: true,
     lastHeard: Date.now(),
     figur: FIGUR.HERR_WOLF,
@@ -95,6 +101,7 @@ export function addPlayer(name: string, info: { address: string, port: number },
 
 export function removePlayer(netId: number) {
   const playerIndex = players.findIndex(player => player.netId === netId)
+  sendQueuedGameStateMessagesForPlayer(players[playerIndex])
   return players.splice(playerIndex, 1)?.[0]
 }
 

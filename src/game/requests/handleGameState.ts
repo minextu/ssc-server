@@ -30,7 +30,7 @@ export function handleGameState(requestId: number, player: Player, message: stri
     case GAME_STATE_TYPE.PLAYER_READY: {
       // broadcast gamestate login to other players with correct figur attached
       if (gameSettings.type === GAME_TYPE.NORMAL) {
-        sendGameStateToAll(GAME_STATE_TYPE.NEW_PLAYER, intToStr(player.netId, 2) + intToStr(player.figur, 2), player, requestId)
+        sendGameStateToAll(GAME_STATE_TYPE.NEW_PLAYER, intToStr(player.netId, 2) + intToStr(player.figur, 2), [player], requestId)
       }
 
       // update teams
@@ -54,7 +54,7 @@ export function handleGameState(requestId: number, player: Player, message: stri
     case GAME_STATE_TYPE.FIGUR_UPDATE: {
       const figur = strToInt(messageData, 2) as FIGUR
       player.figur = figur
-      sendGameStateToAll(GAME_STATE_TYPE.FIGUR_UPDATE, intToStr(figur, 2) + intToStr(player.netId, 2), player, requestId)
+      sendGameStateToAll(GAME_STATE_TYPE.FIGUR_UPDATE, intToStr(figur, 2) + intToStr(player.netId, 2), [player], requestId)
       break
     }
     case GAME_STATE_TYPE.FIRE: {
@@ -146,11 +146,13 @@ export function handleGameState(requestId: number, player: Player, message: stri
       break
     }
     case GAME_STATE_TYPE.CHAT: {
-      const _team = strToInt(messageData, 1)
+      const targetTeam = strToInt(messageData, 1)
       const text = messageData.slice(1, -1)
       const _netId = strToInt(messageData.slice(-1), 1)
 
-      sendGameStateToAll(GAME_STATE_TYPE.CHAT, text + intToStr(player.netId, 1), undefined, requestId)
+      const otherTeamPlayers = gameSettings.type === GAME_TYPE.TEAM && targetTeam !== 3 ? players.filter(p => p.team !== player.team) : undefined
+
+      sendGameStateToAll(GAME_STATE_TYPE.CHAT, text + intToStr(player.netId, 1), otherTeamPlayers, requestId)
       break
     }
     default:

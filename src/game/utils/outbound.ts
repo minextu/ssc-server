@@ -23,12 +23,12 @@ export function sendToPlayer(messageType: GAME_PACKET, messageData: string, play
   gameServer.send(gameEncryptString(message), player.port, player.address)
 }
 
-export function sendToAll(messageType: GAME_PACKET, messageData: string, exceptPlayer?: Player, requestId?: number) {
+export function sendToAll(messageType: GAME_PACKET, messageData: string, exceptPlayers?: Player[], requestId?: number) {
   const message = intToStr(messageType, 1) + intToStr(HOST_ID, 1) + messageData
   logOutbound(message, { packetType: messageType, messageData }, requestId)
 
   for (const player of players) {
-    if (player.netId === exceptPlayer?.netId || player.connecting) {
+    if (exceptPlayers?.map(p => p.netId).includes(player.netId) || player.connecting) {
       continue
     }
 
@@ -40,17 +40,17 @@ export function sendGameStateResponse(gameStateType: GAME_STATE_TYPE, messageDat
   const udpCounter = getUdpCounterForPlayer(player)
 
   const message = intToStr(GAME_PACKET.GAME_STATE, 1) + intToStr(HOST_ID, 1) + intToStr(gameStateType, 2) + intToStr(udpCounter, 4) + messageData
-  logOutbound(message, { packetType: GAME_PACKET.GAME_STATE, gameStateType, messageData }, requestId)
+  logOutbound(message, { packetType: GAME_PACKET.GAME_STATE, gameStateType, messageData, broadcast: 0 }, requestId)
 
   player.udp.packetsToSend.set(udpCounter, { message, lastSend: new Date(0, 0) })
 }
 
-export function sendGameStateToAll(gameStateType: GAME_STATE_TYPE, messageData: string, exceptPlayer?: Player, requestId?: number) {
+export function sendGameStateToAll(gameStateType: GAME_STATE_TYPE, messageData: string, exceptPlayers?: Player[], requestId?: number) {
   const messagePre = intToStr(GAME_PACKET.GAME_STATE, 1) + intToStr(HOST_ID, 1) + intToStr(gameStateType, 2)
   logOutbound(messagePre + intToStr(0, 4) + messageData, { packetType: GAME_PACKET.GAME_STATE, gameStateType, messageData }, requestId)
 
   for (const player of players) {
-    if (player.netId === exceptPlayer?.netId || player.connecting) {
+    if (exceptPlayers?.map(p => p.netId).includes(player.netId) || player.connecting) {
       continue
     }
 

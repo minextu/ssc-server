@@ -87,14 +87,3 @@ services:
     command: game 3 2 -p 8090
     ports:
       - "8090:8090/udp"
-
-  teamgame4:
-    image: minextu/ssc-server
-    build: .
-    restart: on-failure
-    env_file: ".env"
-    environment:
-      - MASTER_INTERNAL_IP=master
-    command: game 4 2 -p 8091
-    ports:
-      - "8091:8091/udp"
