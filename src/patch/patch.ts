@@ -19,12 +19,12 @@ export const patchServer = net.createServer((socket) => {
   socket.on('data', (data) => {
     const str = data.toString().replaceAll('\n', '').replaceAll('\r', '')
     if (!str) {
-      return
+      return socket.end()
     }
 
     const message = patchDecryptString(str)
     if (!message) {
-      return
+      return socket.end()
     }
 
     console.log(chalk.gray(`PATCH IN: ${JSON.stringify(message)}`))
@@ -43,6 +43,12 @@ export const patchServer = net.createServer((socket) => {
       default:
         console.log(chalk.red(`PATCH LOG: Unsupported operation, operation: ${JSON.stringify(message[0])} (${operation})`))
     }
+
+    return socket.end()
+  })
+
+  socket.on('error', (error) => {
+    console.log(chalk.red(`PATCH SOCKET ERROR: ${error}`))
   })
 })
 

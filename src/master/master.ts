@@ -1,7 +1,7 @@
 import net from 'node:net'
 import chalk from 'chalk'
 import { VERSION } from '../constants.js'
-import { GAME_TYPE, LEVEL, MASTER_RESPONSE } from '../enums.js'
+import { MASTER_RESPONSE } from '../enums.js'
 import { convertIp, intToStr, strToInt } from '../utils/convert.js'
 import { masterDecryptString, masterEncryptString } from '../utils/encryption.js'
 import { servers } from './game-bridge.js'
@@ -31,8 +31,8 @@ export const masterServer = net.createServer((socket) => {
         'HTTP/1.0 501 Not Implemented\r\n'
         + '\r\n',
       )
-      socket.end()
-      return
+      // this request was not made by the game client, we can close it safely
+      return socket.end()
     }
 
     const message = masterDecryptString(str)
@@ -69,6 +69,10 @@ export const masterServer = net.createServer((socket) => {
       default:
         console.log(chalk.red(`MASTER LOG: Unsupported operation, operation: ${JSON.stringify(message[0])} (${operation})`))
     }
+  })
+
+  socket.on('error', (error) => {
+    console.log(chalk.red(`MASTER SOCKET ERROR: ${error}`))
   })
 })
 
