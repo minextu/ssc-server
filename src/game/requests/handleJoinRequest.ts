@@ -48,7 +48,7 @@ export function handleJoinRequest(requestId: number, messageData: string, info: 
       + intToStr(numPlayers, 1)
       + intToStr(gameSettings.maxPlayers, 1)
       + intToStr(gameType, 1)
-      + intToStr(gameSettings.timeoutPeriod, 1),
+      + intToStr(gameSettings.timeoutPeriod / 1000, 1),
       player,
       requestId,
     )

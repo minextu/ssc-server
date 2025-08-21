@@ -1,4 +1,5 @@
 import type { WEAPON } from '../../enums.js'
+import { HOST_ID } from '../../constants.js'
 import { GAME_PACKET, LEAVE_TYPE } from '../../enums.js'
 import { intToStr, strToInt } from '../../utils/convert.js'
 import { log } from '../../utils/logging.js'
@@ -22,6 +23,7 @@ export function handleMessage(
 
   if (!player) {
     log('dropping packet from unknown player', 'error', requestId)
+    sendResponse(GAME_PACKET.HOST_DISCONNECT, intToStr(HOST_ID, 1), info, requestId)
     return
   }
 
