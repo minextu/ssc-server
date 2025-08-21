@@ -59,8 +59,21 @@ export const masterServer = net.createServer((socket) => {
         const name = message.slice(2)
         console.log(chalk.whiteBright(`MASTER LOG: list with mode ${mode}; name ${name}`))
 
-        const serverList = generateServerListResponse()
-        const response = MASTER_RESPONSE.SUCCESS + serverList + VERSION.padStart(4, '0')
+        let response
+        // The original game client always sends 1 here
+        if (mode !== 1) {
+          console.log(chalk.yellow(`MASTER LOG: mode ${mode} is invalid`))
+          response = MASTER_RESPONSE.UNKNOWN_GAME_TYPE
+        }
+        // ensure this name is unique across every game server
+        else if (servers.flatMap(server => server.names).filter(name => name !== 'Herr Unbekannt').includes(name)) {
+          console.log(chalk.yellow(`MASTER LOG: name ${name} is aleady taken`))
+          response = MASTER_RESPONSE.INVALID_NAME
+        }
+        else {
+          const serverList = generateServerListResponse()
+          response = MASTER_RESPONSE.SUCCESS + serverList + VERSION.padStart(4, '0')
+        }
 
         console.log(chalk.blueBright(`MASTER REPLY: ${JSON.stringify(response)}`))
         socket.write(`${masterEncryptString(response)}\r\n`)

@@ -9,6 +9,7 @@ export interface MasterInfoPacket {
 export type MasterBridgePacket = GameSettings & {
   packetType: 'GAME_UPDATE'
   currentPlayers: number
+  names: string[]
   ip: string
 }
 

@@ -14,7 +14,7 @@ export function handleJoinRequest(requestId: number, messageData: string, info: 
 
     log('player joined', 'info', requestId, { joinType, name })
 
-    if (findPlayerByName(name)) {
+    if (name !== 'Herr Unbekannt' && findPlayerByName(name)) {
       log('duplicated name', 'warning', requestId)
       sendResponse(
         GAME_PACKET.PLAYER_JOIN_REQUEST,

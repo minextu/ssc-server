@@ -140,6 +140,7 @@ export function processPlayerTimeouts() {
   players.filter(p => p.connecting).forEach((player) => {
     if (Date.now() - player.lastHeard > gameSettings.timeoutPeriod) {
       log('connecting player timed out!', 'warning', undefined, { netId: player.netId, name: player.name })
+      removePlayer(player.netId)
     }
   })
 }

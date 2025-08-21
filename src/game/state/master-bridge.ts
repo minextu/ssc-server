@@ -26,6 +26,7 @@ masterClient.on('connect', () => {
         ...gameSettings,
         packetType: 'GAME_UPDATE',
         currentPlayers: players.length,
+        names: players.map(player => player.name),
         ip: GAME_EXTERNAL_IP,
 
       } satisfies MasterBridgePacket,
